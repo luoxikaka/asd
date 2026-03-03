@@ -3,7 +3,7 @@ name: Run Python Script
 # 这个定义什么时候运行，比如 push 或 pull request
 on:
   push:
-    branches: ["main"]
+    branches: ["master"]
   pull_request:
 
 jobs:
