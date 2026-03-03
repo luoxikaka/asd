@@ -1,0 +1,29 @@
+name: Run Python Script
+
+# 这个定义什么时候运行，比如 push 或 pull request
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.x"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Run your Python script
+        run: |
+          python baidu_openclaw_news_playwright.py
