@@ -4,7 +4,8 @@ print("Hello, trigger workflow!")
 def fetch_openclaw_news(limit: int = 2) -> list[dict[str, str]]:
     """Search `openclaw` on Baidu News and return top news results."""
     with sync_playwright() as p:
-        browser = p.chromium.launch(channel="chrome", headless=False)
+        browser = p.chromium.launch(headless=True)
+       # browser = p.chromium.launch(channel="chrome", headless=False)
         page = browser.new_page()
 
         page.goto("https://www.baidu.com", wait_until="domcontentloaded")
