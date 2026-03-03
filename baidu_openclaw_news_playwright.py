@@ -1,6 +1,6 @@
 from playwright.sync_api import sync_playwright
 
-123
+
 def fetch_openclaw_news(limit: int = 2) -> list[dict[str, str]]:
     """Search `openclaw` on Baidu News and return top news results."""
     with sync_playwright() as p:
@@ -37,3 +37,4 @@ if __name__ == "__main__":
     for idx, item in enumerate(results, start=1):
         print(f"{idx}. {item['title']}")
         print(f"   {item['url']}")
+print("Hello from PR test 🎉")
