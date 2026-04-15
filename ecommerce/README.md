@@ -1,6 +1,6 @@
 # E-commerce 微服务示例（Clean Architecture + DDD）
 
-这是一个按你给出的目录实现的可运行示例，重点演示 `order-service` 的分层职责与代码组织方式。
+，重点演示 `order-service` 的分层职责与代码组织方式。
 
 ## 目录结构
 
