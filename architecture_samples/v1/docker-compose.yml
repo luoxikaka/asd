@@ -1,0 +1,58 @@
+version: "3.9"
+
+services:
+  nginx:
+    image: nginx:1.27-alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - app1
+      - app2
+      - app3
+
+  app1:
+    build: ./app
+    environment:
+      INSTANCE_ID: app1
+      REDIS_URL: redis://redis:6379/0
+      DB_DSN: postgresql://app_user:app_password@postgres:5432/app_db
+    depends_on:
+      - redis
+      - postgres
+
+  app2:
+    build: ./app
+    environment:
+      INSTANCE_ID: app2
+      REDIS_URL: redis://redis:6379/0
+      DB_DSN: postgresql://app_user:app_password@postgres:5432/app_db
+    depends_on:
+      - redis
+      - postgres
+
+  app3:
+    build: ./app
+    environment:
+      INSTANCE_ID: app3
+      REDIS_URL: redis://redis:6379/0
+      DB_DSN: postgresql://app_user:app_password@postgres:5432/app_db
+    depends_on:
+      - redis
+      - postgres
+
+  redis:
+    image: redis:7.2-alpine
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: app_db
+      POSTGRES_USER: app_user
+      POSTGRES_PASSWORD: app_password
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

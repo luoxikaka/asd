@@ -1,0 +1,97 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service
+  namespace: prod-demo
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: user-service
+  template:
+    metadata:
+      labels:
+        app: user-service
+    spec:
+      containers:
+        - name: app
+          image: ghcr.io/example/user-service:1.0.0
+          ports:
+            - containerPort: 8000
+          env:
+            - name: REDIS_URL
+              value: redis://redis-cluster:6379/0
+            - name: DB_URL
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: user_db_url
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+            limits:
+              cpu: "1"
+              memory: "1Gi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service
+  namespace: prod-demo
+spec:
+  selector:
+    app: user-service
+  ports:
+    - port: 8000
+      targetPort: 8000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-service
+  namespace: prod-demo
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: order-service
+  template:
+    metadata:
+      labels:
+        app: order-service
+    spec:
+      containers:
+        - name: app
+          image: ghcr.io/example/order-service:1.0.0
+          ports:
+            - containerPort: 8000
+          env:
+            - name: REDIS_URL
+              value: redis://redis-cluster:6379/1
+            - name: ORDER_DB_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: order_db_shard_router
+            - name: MQ_BROKERS
+              value: kafka-0.kafka:9092,kafka-1.kafka:9092,kafka-2.kafka:9092
+          resources:
+            requests:
+              cpu: "300m"
+              memory: "512Mi"
+            limits:
+              cpu: "2"
+              memory: "2Gi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-service
+  namespace: prod-demo
+spec:
+  selector:
+    app: order-service
+  ports:
+    - port: 8000
+      targetPort: 8000

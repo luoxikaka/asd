@@ -1,0 +1,23 @@
+routes:
+  - uri: /user/*
+    name: user-route
+    upstream:
+      type: roundrobin
+      nodes:
+        "user-service:8000": 1
+    plugins:
+      proxy-rewrite:
+        regex_uri: ["^/user/(.*)", "/$1"]
+
+  - uri: /order/*
+    name: order-route
+    upstream:
+      type: roundrobin
+      nodes:
+        "order-service:8000": 1
+    plugins:
+      proxy-rewrite:
+        regex_uri: ["^/order/(.*)", "/$1"]
+
+# 如果要在网关层做限流，可以启用 limit-count 插件
+# 这里只展示基本路由，限流在 order-service 用 Redis 实现。
