@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis-cluster
+  namespace: prod-demo
+spec:
+  serviceName: redis-cluster
+  replicas: 6
+  selector:
+    matchLabels:
+      app: redis-cluster
+  template:
+    metadata:
+      labels:
+        app: redis-cluster
+    spec:
+      containers:
+        - name: redis
+          image: redis:7.2-alpine
+          args: ["redis-server", "--appendonly", "yes"]
+          ports:
+            - containerPort: 6379
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-cluster
+  namespace: prod-demo
+spec:
+  clusterIP: None
+  selector:
+    app: redis-cluster
+  ports:
+    - port: 6379
+      targetPort: 6379
+---
+# 数据库分库分表建议使用中间件（如 Vitess / ShardingSphere）
+# 下面示例为一个“路由层”服务，业务服务统一连它，由它转发到不同分片。
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db-router
+  namespace: prod-demo
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: db-router
+  template:
+    metadata:
+      labels:
+        app: db-router
+    spec:
+      containers:
+        - name: router
+          image: ghcr.io/example/db-router:1.0.0
+          ports:
+            - containerPort: 3306
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: db-router
+  namespace: prod-demo
+spec:
+  selector:
+    app: db-router
+  ports:
+    - port: 3306
+      targetPort: 3306
